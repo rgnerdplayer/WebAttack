@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "@prisma/client": "5",
+    "express": "^4.x.x",
+    "prisma": "5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.x.x"
+  }
+}
