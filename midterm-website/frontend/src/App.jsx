@@ -32,8 +32,7 @@ const Home = () => (
     <img src="/my-photo.jpg" alt="Owner" style={{ width: '180px', height: '180px', borderRadius: '15px', objectFit: 'cover', border: '4px solid #343536', marginBottom: '20px' }} />
     <h1 style={{ fontSize: '36px', marginBottom: '10px' }}>曾憲揚 (Tseng Sian-Yang)</h1>
     <p style={{ maxWidth: '700px', margin: '0 auto', fontSize: '18px', lineHeight: '1.8', color: '#ccc' }}>
-      目前就讀於國立台灣大學電信工程學研究所 (NTU GICE)。<br/>
-      熱衷於浪漫派鋼琴作品與資安技術，致力於建構兼具美感與安全的數位環境。
+      好難。
     </p>
   </div>
 );
