@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,7 +7,20 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+// 擴充使用者模型
 model User {
-  id    Int    @id @default(autoincrement())
-  name  String
+  id       Int       @id @default(autoincrement())
+  username String    @unique // 必須是唯一值，作為登入帳號
+  password String    // 儲存加密後的密碼，絕對不能存明文！
+  avatar   String?   // 儲存大頭貼的檔案路徑
+  comments Comment[] // 關聯：一個使用者可以有多則留言
+}
+
+// 新增留言板模型
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   // 留言內容
+  createdAt DateTime @default(now()) // 留言時間
+  authorId  Int      // 關聯到 User 的 ID
+  author    User     @relation(fields: [authorId], references: [id])
 }
