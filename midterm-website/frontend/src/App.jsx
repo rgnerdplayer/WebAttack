@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8000/api/v1';
+const API_BASE = 'https://webattack-backend.onrender.com/api/v1';
 
 // --- Navbar 導覽列 ---
 const Navbar = ({ token, onLogout }) => (
@@ -92,7 +92,7 @@ const Forum = () => {
         {comments.map(c => (
           <div key={c.id} style={{ background: '#1a1a1b', border: '1px solid #343536', borderRadius: '4px', display: 'flex' }}>
             <div style={{ width: '140px', padding: '20px', borderRight: '1px solid #343536', textAlign: 'center', background: '#151516' }}>
-              <img src={c.author.avatar ? `http://localhost:8000${c.author.avatar}` : 'https://via.placeholder.com/80'} alt="avatar" style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', marginBottom: '10px', border: '2px solid #343536' }} />
+              <img src={c.author.avatar || 'https://via.placeholder.com/80'} alt="avatar" style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', marginBottom: '10px', border: '2px solid #343536' }} />
               <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#4fbcff', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.author.username}</div>
             </div>
             <div style={{ flex: 1, padding: '20px', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -141,7 +141,7 @@ const Profile = () => {
       <div style={{ background: '#1a1a1b', borderRadius: '8px', border: '1px solid #343536', padding: '30px', textAlign: 'center' }}>
         <h2 style={{ marginBottom: '30px', borderBottom: '1px solid #343536', paddingBottom: '10px' }}>User Profile</h2>
         <div style={{ marginBottom: '40px' }}>
-          <img src={userInfo?.avatar ? `http://localhost:8000${userInfo.avatar}` : 'https://via.placeholder.com/120'} alt="Current Avatar" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #0079d3', marginBottom: '15px' }} />
+          <img src={userInfo?.avatar || 'https://via.placeholder.com/120'} alt="Current Avatar" style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #0079d3', marginBottom: '15px' }} />
           <h3 style={{ margin: '0', color: '#4fbcff' }}>{userInfo?.username}</h3>
         </div>
         <hr style={{ border: '0', borderTop: '1px solid #343536', margin: '30px 0' }} />
