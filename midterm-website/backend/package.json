@@ -10,18 +10,20 @@
   },
   "dependencies": {
     "@google/genai": "^1.50.1",
-    "@prisma/client": "5",
+    "@prisma/config": "^7.7.0",
     "@supabase/supabase-js": "^2.104.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^4.x.x",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
-    "prisma": "5",
     "uuid": "^14.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.x.x"
+    "@prisma/client": "^5.22.0",
+    "nodemon": "^3.x.x",
+    "prisma": "^5.22.0"
   }
 }
