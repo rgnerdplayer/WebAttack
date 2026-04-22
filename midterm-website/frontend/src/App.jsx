@@ -46,35 +46,66 @@ const About = () => (
   </div>
 );
 
-// --- Forum (修正標題顯色) ---
 const Forum = () => {
   const [comments, setComments] = useState([]);
   const [newMsg, setNewMsg] = useState('');
   const token = localStorage.getItem('token');
-  const fetchComments = () => { axios.get(`${API_BASE}/comments`).then(res => setComments(res.data)).catch(err => console.error(err)); };
+
+  const fetchComments = () => {
+    axios.get(`${API_BASE}/comments`).then(res => setComments(res.data)).catch(err => console.error(err));
+  };
   useEffect(() => { fetchComments(); }, []);
+
   const postComment = async () => {
-    if (!token) return alert('Please login!');
+    if (!token) return alert('Please login to post!');
+    if (!newMsg.trim()) return;
     try {
       await axios.post(`${API_BASE}/comments`, { content: newMsg }, { headers: { Authorization: `Bearer ${token}` } });
       setNewMsg(''); fetchComments();
     } catch (err) { alert("發文失敗"); }
   };
+
+  const deleteComment = async (id) => {
+    try {
+      await axios.delete(`${API_BASE}/comments/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      fetchComments();
+    } catch (err) { alert("刪除失敗"); }
+  };
+
   return (
     <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto', color: '#d7dadc' }}>
-      <h2 style={{ marginBottom: '20px', color: '#ffffff' }}>Forum 交流區</h2>
+      <h2 style={{ marginBottom: '20px', color: '#ffffff', textAlign: 'center' }}>Forum 交流區</h2>
       {token ? (
         <div style={{ background: '#1a1a1b', padding: '20px', borderRadius: '4px', marginBottom: '30px', border: '1px solid #343536' }}>
-          <textarea value={newMsg} onChange={e => setNewMsg(e.target.value)} style={{ width: '100%', height: '100px', background: '#272729', color: 'white', border: '1px solid #343536', padding: '10px' }} />
-          <button onClick={postComment} style={{ background: '#d7dadc', color: '#1a1a1b', border: 'none', padding: '10px 25px', marginTop: '10px', fontWeight: 'bold' }}>發送留言</button>
+          <textarea 
+            value={newMsg} 
+            onChange={e => setNewMsg(e.target.value)} 
+            placeholder="說點什麼吧..." 
+            style={{ width: '100%', height: '100px', background: '#272729', color: 'white', border: '1px solid #343536', padding: '10px', borderRadius: '4px', marginBottom: '10px', boxSizing: 'border-box' }} 
+          />
+          <button onClick={postComment} style={{ background: '#d7dadc', color: '#1a1a1b', border: 'none', padding: '10px 25px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>發送留言</button>
         </div>
-      ) : (<p style={{ textAlign: 'center', padding: '20px', color: '#ffffff' }}>請先登入後再參與討論</p>)}
-      {comments.map(c => (
-        <div key={c.id} style={{ background: '#1a1a1b', border: '1px solid #343536', borderRadius: '4px', padding: '20px', marginBottom: '10px' }}>
-          <div style={{ color: '#4fbcff', fontWeight: 'bold' }}>{c.author?.username || 'Guest'}</div>
-          <div style={{ whiteSpace: 'pre-wrap', marginTop: '10px' }}>{c.content}</div>
-        </div>
-      ))}
+      ) : (<p style={{ textAlign: 'center', padding: '20px', background: '#1a1a1b', borderRadius: '4px', border: '1px solid #343536' }}>請先登入後再參與討論</p>)}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {comments.map(c => (
+          <div key={c.id} style={{ background: '#1a1a1b', border: '1px solid #343536', borderRadius: '4px', display: 'flex', overflow: 'hidden' }}>
+            {/* 左側：頭像區域 */}
+            <div style={{ width: '140px', padding: '20px', borderRight: '1px solid #343536', textAlign: 'center', background: '#151516', flexShrink: 0 }}>
+              <img src={c.author?.avatar || 'https://via.placeholder.com/80'} alt="avatar" style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'cover', marginBottom: '10px', border: '2px solid #343536' }} />
+              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#4fbcff', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.author?.username}</div>
+            </div>
+            {/* 右側：內容區域 */}
+            <div style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ fontSize: '16px', lineHeight: '1.6', whiteSpace: 'pre-wrap', color: '#d7dadc' }}>{c.content}</div>
+              <div style={{ marginTop: '20px', fontSize: '12px', color: '#818384', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>發布於不久前</span>
+                <button onClick={() => deleteComment(c.id)} style={{ color: '#ff4500', background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px' }}>刪除</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -163,6 +194,69 @@ const AuthPage = ({ setToken }) => {
       <p style={{ color: '#4fbcff', cursor: 'pointer', marginTop: '20px' }} onClick={() => setIsLogin(!isLogin)}>
         {isLogin ? "Need an account?" : "Login"}
       </p>
+    </div>
+  );
+};
+
+const Divination = () => {
+  const [apiKey, setApiKey] = useState('');
+  const [question, setQuestion] = useState('');
+  const [result, setResult] = useState('');
+  const [loading, setLoading] = useState(false);
+  const token = localStorage.getItem('token');
+
+  const handleDivination = async () => {
+    if (!apiKey.trim() || !question.trim()) return alert("請輸入 API Key 與想問的問題！");
+    setLoading(true);
+    setResult('');
+    try {
+      const res = await axios.post(`${API_BASE}/divination`, { apiKey, question }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setResult(res.data.result);
+    } catch (error) {
+      setResult(error.response?.data?.error || "發生錯誤，請檢查您的 API Key 是否正確。");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: '40px 20px', maxWidth: '600px', margin: '0 auto', color: '#d7dadc' }}>
+      <div style={{ background: '#1a1a1b', borderRadius: '8px', border: '1px solid #343536', padding: '30px' }}>
+        <h2 style={{ textAlign: 'center', color: '#ffd700', marginBottom: '25px' }}>✨ 神秘塔羅占卜 (Gemini Powered)</h2>
+        <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px' }}>Gemini API Key:</label>
+          <input 
+            type="password" 
+            value={apiKey} 
+            onChange={e => setApiKey(e.target.value)} 
+            placeholder="在此輸入您的 API Key" 
+            style={{ width: '100%', padding: '12px', background: '#272729', color: 'white', border: '1px solid #343536', borderRadius: '4px', boxSizing: 'border-box' }} 
+          />
+        </div>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px' }}>占卜問題:</label>
+          <textarea 
+            value={question} 
+            onChange={e => setQuestion(e.target.value)} 
+            placeholder="你想占卜什麼？例如：我期中考會過嗎？" 
+            style={{ width: '100%', height: '100px', background: '#272729', color: 'white', padding: '10px', border: '1px solid #343536', borderRadius: '4px', boxSizing: 'border-box' }} 
+          />
+        </div>
+        <button 
+          onClick={handleDivination} 
+          disabled={loading} 
+          style={{ width: '100%', padding: '15px', background: '#8a2be2', color: 'white', cursor: loading ? 'not-allowed' : 'pointer', border: 'none', borderRadius: '4px', fontWeight: 'bold', fontSize: '16px' }}
+        >
+          {loading ? "🔮 正在解讀星象..." : "🔮 開始占卜"}
+        </button>
+        {result && (
+          <div style={{ marginTop: '25px', whiteSpace: 'pre-wrap', background: '#272729', padding: '20px', borderRadius: '4px', border: '1px solid #343536', lineHeight: '1.6', color: '#ffd700' }}>
+            {result}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
