@@ -88,8 +88,25 @@ app.post("/api/v1/comments", authenticateToken, async (req, res) => {
 });
 
 app.delete("/api/v1/comments/:id", authenticateToken, async (req, res) => {
-  await prisma.comment.delete({ where: { id: parseInt(req.params.id) } });
-  res.json({ message: "Deleted" });
+  try {
+    // 尋找這篇留言，並且確認 authorId 必須是現在發送請求的這個人 (req.user.userId)
+    const comment = await prisma.comment.findFirst({
+      where: { 
+        id: parseInt(req.params.id),
+        authorId: req.user.userId // 加上這行，確保是他自己的留言！
+      }
+    });
+
+    if (!comment) {
+      return res.status(403).json({ error: "無權刪除別人的留言或留言不存在" });
+    }
+
+    // 確定是他的，才執行刪除
+    await prisma.comment.delete({ where: { id: parseInt(req.params.id) } });
+    res.json({ message: "Deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // 【重點升級】直接將圖片上傳至 Supabase Storage
