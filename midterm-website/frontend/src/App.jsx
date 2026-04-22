@@ -279,7 +279,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/forum" element={<Forum />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/divination" element={<div>Divination Page</div>} />
+          <Route path="/divination" element={<Divination />} />
           <Route path="/auth" element={<AuthPage setToken={setToken} />} />
         </Routes>
       </div>
